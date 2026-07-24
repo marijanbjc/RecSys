@@ -77,20 +77,3 @@ def get_recs(user_id: str):
         item_ids += random_ids
 
     return RecommendationsResponse(item_ids=item_ids)
-
-
-# docker run -d --rm -p 6379:6379 redis/redis-stack-server:latest
-# docker run -d --rm --name rabbitmq -p 5672:5672 -p 5673:5673 -p 15672:15672 rabbitmq:3-management
-
-# sftp root@135.181.37.248
-# mkdir final_project
-# put -R * final_project/
-# pip install --no-cache-dir -r requirements.txt
-# uvicorn event_collector.main:app --host 0.0.0.0 --port 5000
-# uvicorn recommendations.main:app --host 0.0.0.0 --port 5001
-# uvicorn webapp.app:app --host 0.0.0.0
-
-# docker build -t event_collector event_collector/.
-# docker build -t recommendations recommendations/.
-# docker run -d --rm event_collector
-# docker run -d --rm recommendations
