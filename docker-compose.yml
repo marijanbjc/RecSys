@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "5673:5673"
+      - "15672:15672"
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis/redis-stack-server:latest
+    ports:
+      - "6379:6379"
+
+  recommendations:
+    build:
+      context: .
+      dockerfile: recommendations/Dockerfile
+    ports:
+      - "5001:5001"
+    depends_on:
+      - redis
+      - rabbitmq
+
+  event-collector:
+    build:
+      context: .
+      dockerfile: event_collector/Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+      - rabbitmq
+
+  regular-pipeline:
+    build:
+      context: .
+      dockerfile: regular_pipeline/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  webapp:
+    build:
+      context: .
+      dockerfile: webapp/Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
