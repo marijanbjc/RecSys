@@ -12,9 +12,7 @@ graph TD
     A -->|HTTP /interact| C[Event Collector<br/>FastAPI, порт 5000]
     C -->|RabbitMQ| D[Regular Pipeline<br/>Асинхронный скрипт]
     D -->|Чтение/запись| E[(Redis)]
-    D -->|Чтение/запись| F[(RabbitMQ)]
     B -->|Чтение| E
-    B -->|Чтение| F
 ```
 
 ### Компоненты
