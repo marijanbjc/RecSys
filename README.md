@@ -26,16 +26,16 @@ graph TD
         RD[(Redis Stack<br/>порт 6379)]
     end
 
-    WA -->|GET /recs/{user_id}| RS
+    WA -->|GET /recs/user-id| RS
     WA -->|POST /interact| EC
     WA -->|POST /add_items| RS
 
     EC -->|publish message| RMQ
     RMQ -->|consume messages| RP
 
-    RP -->|чтение/запись| RD
-    RS -->|чтение| RD
-    EC -->|запись истории| RD
+    RP -->|read/write| RD
+    RS -->|read| RD
+    EC -->|write history| RD
 
     style WA fill:#e1f5fe
     style RS fill:#e8f5e9
