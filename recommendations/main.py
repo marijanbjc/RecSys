@@ -42,9 +42,9 @@ class RecommendationManager:
         global unique_item_ids
         unique_item_ids = set()
 
-        self.redis_connection.json().delete(f"{self.INTERACTION_PREFIX}*")
-        self.redis_connection.json().delete(f"{self.TOP_RECOMMENDATION_PREFIX}*")
-        self.redis_connection.json().delete(f"{self.ALS_RECOMMENDATION_PREFIX}*")
+        for pattern in [f"{self.INTERACTION_PREFIX}*", f"{self.ALS_RECOMMENDATION_PREFIX}*", f"{self.TOP_RECOMMENDATION_PREFIX}*"]:
+            for key in self.redis_connection.scan_iter(match=pattern):
+                self.redis_connection.delete(key)
 
     @staticmethod
     def add_items(item_ids: list[str]) -> None:

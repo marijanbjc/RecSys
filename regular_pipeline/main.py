@@ -41,7 +41,7 @@ class RedisManager:
 
     def set_user_als_items(self, user_id: str, items: list[str]) -> None:
         self.redis_connection.json().set(
-            f"{self.ALS_RECOMMENDATION_PREFIX}-{user_id}", items
+            f"{self.ALS_RECOMMENDATION_PREFIX}-{user_id}", ".", items
         )
 
     def close(self) -> None:

@@ -16,7 +16,7 @@ class WatchedFilter:
         try:
             for item_id in item_ids:
                 self.redis_connection.set(
-                    f"{self.watched_prefix}-{user_id}-{item_id}", 1
+                    f"{self.watched_prefix}-{user_id}-{item_id}", ".", 1
                 )
         except redis.exceptions.ConnectionError:
             # ignore errors if redis unavailable
@@ -37,7 +37,8 @@ class WatchedFilter:
 
     def remove_all(self) -> None:
         try:
-            self.redis_connection.json().delete(f"{self.watched_prefix}*")
+            for key in self.redis_connection.scan_iter(match=f"{self.watched_prefix}*"):
+                self.redis_connection.json().delete(key)
         except redis.exceptions.ConnectionError:
             # ignore errors if redis unavailable
             pass
