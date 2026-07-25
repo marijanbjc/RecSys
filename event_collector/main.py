@@ -4,23 +4,15 @@ import time
 
 import aio_pika
 from aio_pika import Message
-from aio_pika.abc import AbstractRobustExchange, AbstractRobustConnection
+from aio_pika.abc import AbstractRobustConnection, AbstractRobustExchange
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from models import InteractEvent
-from watched_filter import WatchedFilter
+from shared.config import AppSettings, settings
+from shared.models import InteractEvent
+from shared.watched_filter import WatchedFilter
 
 app = FastAPI()
-watched_filter = WatchedFilter()
-
-queue_name = "user_interactions"
-routing_key = "user.interact.message"
-exchange = "user.interact"
-
-_rabbitmq_connection: AbstractRobustConnection = None
-_rabbitmq_exchange = None
-
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -31,48 +23,59 @@ app.add_middleware(
 )
 
 
-@app.get('/healthcheck')
-def read_root():
-    return True
+watched_filter = WatchedFilter(settings)
+
+_rabbitmq_connection: AbstractRobustConnection = None
+_rabbitmq_exchange = None
 
 
-@app.post('/interact')
-async def interact(message: InteractEvent):
-    message.timestamp = time.time()
-    await publish_message(Message(
-        bytes(json.dumps(message.model_dump()), "utf-8"),
-        content_type="text/json",
-    ))
-
-    watched_filter.add(message.user_id, message.item_ids)
-    return 200
-
-
-async def create_rabbitmq_exchange() -> AbstractRobustExchange:
+async def create_rabbitmq_exchange(settings: AppSettings) -> AbstractRobustExchange:
     global _rabbitmq_exchange, _rabbitmq_connection
-    if _rabbitmq_exchange is None or _rabbitmq_connection.is_closed:
+    if _rabbitmq_exchange is None:
         _rabbitmq_connection = await aio_pika.connect_robust(
-            "amqp://guest:guest@rabbitmq:5672/",
-            loop=asyncio.get_event_loop()
+            f"amqp://{settings.rabbit_settings.RABBITMQ_HOST}:{settings.rabbit_settings.USER}@rabbitmq:{settings.rabbit_settings.RABBIT_PORT}/",
+            loop=asyncio.get_event_loop(),
         )
 
         # Creating channel
         channel = await _rabbitmq_connection.channel()
 
         # Declaring exchange
-        _rabbitmq_exchange = await channel.declare_exchange("user.interact", type='direct')
+        _rabbitmq_exchange = await channel.declare_exchange(
+            settings.rabbit_settings.EXCHANGE, type="direct"
+        )
 
         # Declaring queue
-        queue = await channel.declare_queue(queue_name)
+        queue = await channel.declare_queue(settings.rabbit_settings.QUEUE_NAME)
 
         # Binding queue
-        await queue.bind(_rabbitmq_exchange, routing_key)
+        await queue.bind(_rabbitmq_exchange, settings.rabbit_settings.routing_key)
     return _rabbitmq_exchange
 
 
-async def publish_message(message: Message):
-    rabbitmq_exchange = await create_rabbitmq_exchange()
+async def publish_message(settings: AppSettings, message: Message):
+    rabbitmq_exchange = await create_rabbitmq_exchange(settings)
     await rabbitmq_exchange.publish(
         message,
-        routing_key,
+        settings.rabbit_settings.routing_key,
     )
+
+
+@app.get("/healthcheck")
+def read_root():
+    return True
+
+
+@app.post("/interact")
+async def interact(message: InteractEvent) -> int:
+    message.timestamp = time.time()
+    await publish_message(
+        message=Message(
+            bytes(json.dumps(message.model_dump()), "utf-8"),
+            content_type="text/json",
+        ),
+        settings=settings,
+    )
+
+    watched_filter.add(message.user_id, message.item_ids)
+    return 200
