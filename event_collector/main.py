@@ -33,7 +33,7 @@ async def create_rabbitmq_exchange(settings: AppSettings) -> AbstractRobustExcha
     global _rabbitmq_exchange, _rabbitmq_connection
     if _rabbitmq_exchange is None:
         _rabbitmq_connection = await aio_pika.connect_robust(
-            f"amqp://{settings.rabbit_settings.RABBITMQ_HOST}:{settings.rabbit_settings.USER}@rabbitmq:{settings.rabbit_settings.RABBIT_PORT}/",
+            f"amqp://{settings.rabbit_settings.HOST}:{settings.rabbit_settings.USER}@rabbitmq:{settings.rabbit_settings.PORT}/",
             loop=asyncio.get_event_loop(),
         )
 
