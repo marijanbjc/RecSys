@@ -57,8 +57,10 @@ class RecommendationManager:
         global unique_item_ids
         if (
             len(item_ids) == 0
-            or random.random() < self.EPSILON
-            and len(unique_item_ids) > 0
+            or (
+                random.random() < self.EPSILON
+                and len(unique_item_ids) > 0
+            )
         ):
             random_ids = np.random.choice(
                 list(unique_item_ids), size=max(17 - len(item_ids), 2), replace=False
