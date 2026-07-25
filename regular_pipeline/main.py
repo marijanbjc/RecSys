@@ -13,7 +13,7 @@ import scipy.sparse as sp
 from implicit.als import AlternatingLeastSquares
 from pydantic import BaseModel
 
-from shared.config import AppSettings, RedisSettings, settings
+from shared.config import AppSettings, RedisSettings, settings, RegularPipelineSettings
 from shared.logger import setup_logger
 
 logger = setup_logger("regular_pipeline")
@@ -137,14 +137,6 @@ def calculate_top_recommendations(
     redis_manager.set_top_items(top_items)
 
 
-class ModelParams(BaseModel):
-    factors: int = 64
-    iterations: int = 15
-    alpha: float = 1.0
-    regularization: float = 0.1
-    random_state: int = 42
-
-
 class DataPreprocessor:
     def __init__(self, min_positive_actions: int = 1, test_size: int = 1):
         self.min_positive_actions = min_positive_actions
@@ -221,9 +213,23 @@ class DataPreprocessor:
         return sp.csr_matrix((data, (rows, cols)), dtype=np.float32)
 
 
+class ModelParams(BaseModel):
+    factors: int
+    iterations: int
+    alpha: float
+    regularization: float
+    random_state: int
+
 class ALSRecommender:
-    def __init__(self, model_params: ModelParams | None = None):
-        self.model_params = model_params or ModelParams()
+    def __init__(self, settings: RegularPipelineSettings):
+        self.model_params = ModelParams(
+            settings.ALS_FACTORS,
+            settings.ALS_ITERATIONS,
+            settings.ALS_ALPHA,
+            settings.ALS_REGULARIZATION,
+            settings.random_state,
+        )
+
         self.model: AlternatingLeastSquares | None = None
 
     def fit(self, user_item_data: sp.csr_matrix) -> None:
@@ -398,7 +404,7 @@ def calculate_als_recommendations(
     )
     # best_params = optimizer.optimize(user_item_data, interactions_grouped, preprocessor)
 
-    recommender = ALSRecommender()
+    recommender = ALSRecommender(settings.regular_pipeline_settings)
     recommender.fit(user_item_data)
 
     _ = recommender.recommend_all(
