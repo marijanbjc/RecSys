@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -36,7 +36,7 @@ class RecommendationSettings(BaseSettings):
 
 
 class AppSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file='.env')
+    model_config = SettingsConfigDict(env_file=".env")
     redis_settings: RedisSettings = RedisSettings()
     rabbit_settings: RabbitSettings = RabbitSettings()
     watched_filter_settings: WatchedFilterSettings = WatchedFilterSettings()

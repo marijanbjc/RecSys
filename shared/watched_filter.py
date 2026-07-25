@@ -9,13 +9,15 @@ class WatchedFilter:
         self.redis_connection = redis.Redis(
             host=settings.redis_settings.HOST,
             port=settings.redis_settings.PORT,
-            db=settings.redis_settings.DB
+            db=settings.redis_settings.DB,
         )
 
     def add(self, user_id: str, item_ids: list[str]) -> None:
         try:
             for item_id in item_ids:
-                self.redis_connection.set(f"{self.watched_prefix}-{user_id}-{item_id}", 1)
+                self.redis_connection.set(
+                    f"{self.watched_prefix}-{user_id}-{item_id}", 1
+                )
         except redis.exceptions.ConnectionError:
             # ignore errors if redis unavailable
             pass
@@ -32,7 +34,6 @@ class WatchedFilter:
             if self.get(user_id, item_id) is None:
                 filtered_item_ids.append(item_id)
         return filtered_item_ids
-
 
     def remove_all(self) -> None:
         try:
