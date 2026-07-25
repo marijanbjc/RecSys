@@ -10,7 +10,7 @@ from shared.models import NewItemsEvent, RecommendationsResponse
 from shared.watched_filter import WatchedFilter
 
 logger = setup_logger("recommendation_logger")
-logger.setLevel(settings.recommendation_settings.LOG_LEVEL)
+logger.setLevel(settings.LOG_LEVEL)
 
 
 unique_item_ids = set()
