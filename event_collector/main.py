@@ -3,16 +3,14 @@ import json
 import time
 
 import aio_pika
+import redis
 from aio_pika import Message
 from aio_pika.abc import AbstractRobustConnection, AbstractRobustExchange
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import redis
-
-from shared.logger import setup_logger
 from shared.config import AppSettings, settings
+from shared.logger import setup_logger
 from shared.models import InteractEvent
-
 
 logger = setup_logger("event-collector")
 logger.setLevel(settings.LOG_LEVEL)
@@ -26,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class InteractionManager:
     def __init__(self, settings: AppSettings) -> None:
         self.interaction_prefix = settings.redis_settings.INTERACTION_PREFIX
@@ -38,15 +37,20 @@ class InteractionManager:
     def add(self, user_id: str, items_ids: list[str]) -> None:
         try:
             logger.info(f"Finding user interaction-history {user_id}")
-            history = self.redis_connection.json().get(f"{self.interaction_prefix}-{user_id}")
+            history = self.redis_connection.json().get(
+                f"{self.interaction_prefix}-{user_id}"
+            )
             logger.info(f"Found history {history}")
             if history is None:
                 history = []
             history.extend(items_ids)
             logger.info(f"Setting history {history}")
-            self.redis_connection.json().set(f"{self.interaction_prefix}-{user_id}", ".", history)
+            self.redis_connection.json().set(
+                f"{self.interaction_prefix}-{user_id}", ".", history
+            )
         except Exception as e:
             logger.error(e)
+
 
 interaction_manager = InteractionManager(settings)
 

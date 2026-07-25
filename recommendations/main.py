@@ -3,7 +3,6 @@ import random
 import numpy as np
 import redis
 from fastapi import FastAPI
-
 from shared.config import AppSettings, settings
 from shared.logger import setup_logger
 from shared.models import NewItemsEvent, RecommendationsResponse
@@ -42,7 +41,11 @@ class RecommendationManager:
         global unique_item_ids
         unique_item_ids = set()
 
-        for pattern in [f"{self.INTERACTION_PREFIX}*", f"{self.ALS_RECOMMENDATION_PREFIX}*", f"{self.TOP_RECOMMENDATION_PREFIX}*"]:
+        for pattern in [
+            f"{self.INTERACTION_PREFIX}*",
+            f"{self.ALS_RECOMMENDATION_PREFIX}*",
+            f"{self.TOP_RECOMMENDATION_PREFIX}*",
+        ]:
             for key in self.redis_connection.scan_iter(match=pattern):
                 self.redis_connection.delete(key)
 
@@ -55,18 +58,14 @@ class RecommendationManager:
 
     def add_random_items(self, item_ids: list[str]) -> list[str]:
         global unique_item_ids
-        if (
-            len(item_ids) == 0
-            or (
-                random.random() < self.EPSILON
-                and len(unique_item_ids) > 0
-            )
+        if len(item_ids) == 0 or (
+            random.random() < self.EPSILON and len(unique_item_ids) > 0
         ):
             logger.info(f"Unique item-ids len: {len(unique_item_ids)}")
             random_ids = np.random.choice(
                 list(unique_item_ids),
                 size=min(17 - len(item_ids), len(unique_item_ids)),
-                replace=False
+                replace=False,
             ).tolist()
 
             if len(item_ids) == 0:
@@ -114,7 +113,9 @@ class RecommendationManager:
                     )
                     item_ids = self.watched_filter.filter_user_items(user_id, item_ids)
                     logger.info(f"After filtering watched items {user_id}: {item_ids}")
-                    item_ids = np.random.choice(item_ids, min(self.TOP_K, len(item_ids)), replace=False)
+                    item_ids = np.random.choice(
+                        item_ids, min(self.TOP_K, len(item_ids)), replace=False
+                    )
                 else:
                     logger.info(f"{user_id} has no als-items")
                     item_ids = []
@@ -134,6 +135,7 @@ class RecommendationManager:
         self.watched_filter.add(user_id, item_ids)
 
         return item_ids
+
 
 app = FastAPI()
 recommendation_manager = RecommendationManager(settings)

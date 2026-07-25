@@ -4,9 +4,7 @@ import uuid
 import polars as pl
 import requests
 from flask import Flask, render_template, request, session
-
 from shared.config import settings
-from shared.models import NewItemsEvent
 
 app = Flask("webapp")
 app.secret_key = os.urandom(24)
@@ -77,14 +75,16 @@ def index():
         user_id=user_id,
     )
 
+
 @app.route("/interact", methods=["POST"])
 def interact_proxy():
     response = requests.post(
         f"{settings.services_settings.interactions_service_url}/interact",
         json=request.json,
-        headers={"Content-Type": "application/json"}
+        headers={"Content-Type": "application/json"},
     )
     return response.content, response.status_code
+
 
 def get_user_id_from_cookies():
     # Implement your logic to retrieve user_id from cookies
@@ -106,7 +106,7 @@ def fetch_items_data_for_item_ids(item_ids):
 
 if __name__ == "__main__":
     data = {
-        "item_ids": [str(i) for i in movie_id_genres.keys()],
+        "item_ids": [str(i) for i in movie_id_genres],
         "genres": list(movie_id_genres.values()),
     }
 

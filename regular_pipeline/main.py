@@ -12,8 +12,7 @@ import redis
 import scipy.sparse as sp
 from implicit.als import AlternatingLeastSquares
 from pydantic import BaseModel
-
-from shared.config import AppSettings, RedisSettings, settings, RegularPipelineSettings
+from shared.config import AppSettings, RedisSettings, RegularPipelineSettings, settings
 from shared.logger import setup_logger
 
 logger = setup_logger("regular_pipeline")
@@ -28,13 +27,9 @@ class RedisManager:
             db=settings.DB,
         )
 
-        self.TOP_RECOMMENDATION_PREFIX = (
-            settings.TOP_RECOMMENDATION_PREFIX
-        )
+        self.TOP_RECOMMENDATION_PREFIX = settings.TOP_RECOMMENDATION_PREFIX
 
-        self.ALS_RECOMMENDATION_PREFIX = (
-            settings.ALS_RECOMMENDATION_PREFIX
-        )
+        self.ALS_RECOMMENDATION_PREFIX = settings.ALS_RECOMMENDATION_PREFIX
 
     def set_top_items(self, top_items: list[str]) -> None:
         self.redis_connection.json().set(self.TOP_RECOMMENDATION_PREFIX, ".", top_items)
@@ -219,6 +214,7 @@ class ModelParams(BaseModel):
     alpha: float
     regularization: float
     random_state: int
+
 
 class ALSRecommender:
     def __init__(self, settings: RegularPipelineSettings):
