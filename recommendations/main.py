@@ -65,7 +65,7 @@ def get_recs(user_id: str):
                 print(f"But for {user_id} has no als-recommendations")
                 item_ids = []
 
-    except BaseException as e:
+    except Exception as e:
         print(f"Exception: {e}")
         item_ids = []
 
