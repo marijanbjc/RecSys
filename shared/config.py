@@ -40,8 +40,8 @@ class RegularPipelineSettings(BaseSettings):
 
 class ServicesSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="SERVICES_")
-    recommendations_url: str = "http://46.62.174.201:5001"
-    interactions_url: str = "http://46.62.174.201:5000"
+    recommendation_service_url: str = "http://46.62.174.201:5001"
+    interactions_service_url: str = "http://46.62.174.201:5000"
     webapp_port: int = 8000
 
 
