@@ -99,7 +99,7 @@ def fetch_items_data_for_item_ids(item_ids):
 if __name__ == "__main__":
     data = {
         "item_ids": [str(i) for i in movie_id_genres.keys()],
-        "genres": [str(i) for i in movie_id_genres.values()],
+        "genres": list(movie_id_genres.values()),
     }
 
     requests.post(
