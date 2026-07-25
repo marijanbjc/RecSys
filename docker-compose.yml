@@ -21,6 +21,8 @@ services:
     build:
       context: .
       dockerfile: recommendations/Dockerfile
+    env_file:
+      shared/.env
     ports:
       - "5001:5001"
     depends_on:
@@ -31,8 +33,10 @@ services:
     build:
       context: .
       dockerfile: event_collector/Dockerfile
+    env_file:
+      shared/.env
     ports:
-      - "5000:5000"
+      - "5002:5000"
     depends_on:
       - redis
       - rabbitmq
@@ -41,6 +45,8 @@ services:
     build:
       context: .
       dockerfile: regular_pipeline/Dockerfile
+    env_file:
+      shared/.env
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -51,6 +57,8 @@ services:
       dockerfile: webapp/Dockerfile
     ports:
       - "8000:8000"
+    env_file:
+      shared/.env
     depends_on:
       rabbitmq:
         condition: service_healthy
