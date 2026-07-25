@@ -62,8 +62,11 @@ class RecommendationManager:
                 and len(unique_item_ids) > 0
             )
         ):
+            logger.info(f"Unique item-ids len: {len(unique_item_ids)}")
             random_ids = np.random.choice(
-                list(unique_item_ids), size=max(17 - len(item_ids), 2), replace=False
+                list(unique_item_ids),
+                size=min(17 - len(item_ids), len(unique_item_ids)),
+                replace=False
             ).tolist()
             item_ids += random_ids
         return item_ids
@@ -72,11 +75,12 @@ class RecommendationManager:
         try:
             logger.info(f"Getting recommendations for user {user_id}")
 
-            user_history = self.redis_connection.keys(
-                f"{self.INTERACTION_PREFIX}-{user_id}*"
+            user_history = self.redis_connection.json().get(
+                f"{self.INTERACTION_PREFIX}-{user_id}"
             )
+            # logger.info(f"User {user_id} history : {user_history}")
 
-            if len(user_history) == 0:
+            if user_history is None or len(user_history) == 0:
                 logger.info(f"No history for {user_id}")
                 logger.info(f"Getting for {user_id} top-items")
 
@@ -99,12 +103,13 @@ class RecommendationManager:
                     f"{self.ALS_RECOMMENDATION_PREFIX}-{user_id}"
                 )
 
-                if item_ids is not None:
+                if item_ids is not None and len(item_ids) > 0:
                     logger.info(
                         f"Als-items for {user_id} has {len(item_ids)} items, filtering watched"
                     )
                     item_ids = self.watched_filter.filter_user_items(user_id, item_ids)
-                    item_ids = np.random.choice(item_ids, self.TOP_K, replace=False)
+                    logger.info(f"After filtering watched items {user_id}: {item_ids}")
+                    item_ids = np.random.choice(item_ids, min(self.TOP_K, len(item_ids)), replace=False)
                 else:
                     logger.info(f"{user_id} has no als-items")
                     item_ids = []
