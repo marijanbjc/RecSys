@@ -74,9 +74,9 @@ def index():
     return render_template(
         'index.html',
         items_data=items_data,
-        interactions_url=interactions_url
+        interactions_url=interactions_url,
+        user_id=user_id,
     )
-
 
 def get_user_id_from_cookies():
     # Implement your logic to retrieve user_id from cookies

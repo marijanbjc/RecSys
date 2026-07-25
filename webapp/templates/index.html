@@ -37,6 +37,8 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    const CURRENT_USER_ID = '{{ user_id }}';
+
     $(document).ready(function () {
         $('.like-button, .dislike-button').on('click', function () {
             let item_id = $(this).data('item');
@@ -46,7 +48,7 @@
                 type: 'POST',
                 url: '{{ interactions_url }}/interact',
                 contentType: 'application/json',
-                data: JSON.stringify({user_id: getUserID(), item_ids: [item_id.toString()], actions: [action]}),
+                data: JSON.stringify({user_id: CURRENT_USER_ID, item_ids: [item_id.toString()], actions: [action]}),
                 success: function (response) {
                     // Handle the response if needed
                 },
