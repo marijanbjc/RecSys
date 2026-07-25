@@ -28,6 +28,23 @@ class WatchedFilterSettings(BaseModel):
     PREFIX: str = "watched"
 
 
+class RegularPipelineSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="REGULAR_PIPE_")
+    MESSAGES_COLLECTION_INTERVAL: int = 10
+    ALS_FACTORS: int = 64
+    ALS_ITERATIONS: int = 15
+    ALS_ALPHA: float = 1.0
+    ALS_REGULARIZATION: float = 0.1
+    ALS_RANDOM_STATE: float = 42
+
+
+class ServicesSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="SERVICES_")
+    recommendations_url: str = "http://46.62.174.201:5001"
+    interactions_url: str = "http://46.62.174.201:5000"
+    webapp_port: int = 8000
+
+
 class RecommendationSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="RECOMMENDATION_")
     LOG_LEVEL: str = "INFO"
