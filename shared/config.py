@@ -18,6 +18,7 @@ class RabbitSettings(BaseSettings):
     ROUTING_KEY: str = "user.interact.message"
     EXCHANGE: str = "user.interact"
     USER: str
+    PASSWORD: str
     HOST: str
     PORT: int = 5672
     URL: str = "amqp://guest:guest@rabbitmq:5672/"
