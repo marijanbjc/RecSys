@@ -223,11 +223,11 @@ class ModelParams(BaseModel):
 class ALSRecommender:
     def __init__(self, settings: RegularPipelineSettings):
         self.model_params = ModelParams(
-            settings.ALS_FACTORS,
-            settings.ALS_ITERATIONS,
-            settings.ALS_ALPHA,
-            settings.ALS_REGULARIZATION,
-            settings.ALS_RANDOM_STATE,
+            factors=settings.ALS_FACTORS,
+            iterations=settings.ALS_ITERATIONS,
+            alpha=settings.ALS_ALPHA,
+            regularization=settings.ALS_REGULARIZATION,
+            random_state=settings.ALS_RANDOM_STATE,
         )
 
         self.model: AlternatingLeastSquares | None = None
