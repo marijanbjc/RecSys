@@ -23,9 +23,9 @@ logger.setLevel(settings.log_level)
 class RedisManager:
     def __init__(self, settings: RedisSettings):
         self.redis_connection = redis.Redis(
-            host=settings.redis_settings.HOST,
-            port=settings.redis_settings.PORT,
-            db=settings.redis_settings.DB,
+            host=settings.HOST,
+            port=settings.PORT,
+            db=settings.DB,
         )
 
         self.TOP_RECOMMENDATION_PREFIX = (
