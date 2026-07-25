@@ -2,9 +2,8 @@ FROM python:3.11
 
 WORKDIR /app
 
-COPY ./models.py ./
-COPY ./watched_filter.py ./
-COPY recommendations/. ./
+COPY ./shared/ ./shared/
+COPY ./recommendations/. ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
