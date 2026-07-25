@@ -121,6 +121,7 @@ class RecommendationManager:
         item_ids = self.add_random_items(item_ids)
 
         logger.info(f"Final recommendations for {user_id}: {item_ids}")
+        self.watched_filter.add(user_id, item_ids)
 
         return item_ids
 
