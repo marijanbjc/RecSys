@@ -33,7 +33,7 @@ async def create_rabbitmq_exchange(settings: AppSettings) -> AbstractRobustExcha
     global _rabbitmq_exchange, _rabbitmq_connection
     if _rabbitmq_exchange is None:
         _rabbitmq_connection = await aio_pika.connect_robust(
-            f"amqp://{settings.rabbit_settings.HOST}:{settings.rabbit_settings.USER}@rabbitmq:{settings.rabbit_settings.PORT}/",
+            f"amqp://{settings.rabbit_settings.USER}:{settings.rabbit_settings.PASSWORD}@{settings.rabbit_settings.HOST}:{settings.rabbit_settings.PORT}/",
             loop=asyncio.get_event_loop(),
         )
 
@@ -49,7 +49,7 @@ async def create_rabbitmq_exchange(settings: AppSettings) -> AbstractRobustExcha
         queue = await channel.declare_queue(settings.rabbit_settings.QUEUE_NAME)
 
         # Binding queue
-        await queue.bind(_rabbitmq_exchange, settings.rabbit_settings.routing_key)
+        await queue.bind(_rabbitmq_exchange, settings.rabbit_settings.ROUTING_KEY)
     return _rabbitmq_exchange
 
 
@@ -57,7 +57,7 @@ async def publish_message(settings: AppSettings, message: Message):
     rabbitmq_exchange = await create_rabbitmq_exchange(settings)
     await rabbitmq_exchange.publish(
         message,
-        settings.rabbit_settings.routing_key,
+        settings.rabbit_settings.ROUTING_KEY,
     )
 
 
