@@ -47,13 +47,13 @@ class ServicesSettings(BaseSettings):
 
 class RecommendationSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="RECOMMENDATION_")
-    LOG_LEVEL: str = "INFO"
     EPSILON: float = 0.05
     TOP_K: int = 10
 
 
 class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
+    LOG_LEVEL: str = "INFO"
     redis_settings: RedisSettings = RedisSettings()
     rabbit_settings: RabbitSettings = RabbitSettings()
     watched_filter_settings: WatchedFilterSettings = WatchedFilterSettings()
