@@ -68,7 +68,12 @@ class RecommendationManager:
                 size=min(17 - len(item_ids), len(unique_item_ids)),
                 replace=False
             ).tolist()
+
+            if len(item_ids) == 0:
+                return random_ids
+
             item_ids += random_ids
+
         return item_ids
 
     def get_user_recommendations(self, user_id: str) -> list[str]:
