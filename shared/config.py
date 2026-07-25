@@ -54,10 +54,12 @@ class RecommendationSettings(BaseSettings):
 class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
     LOG_LEVEL: str = "INFO"
+    services_settings: ServicesSettings = ServicesSettings()
     redis_settings: RedisSettings = RedisSettings()
     rabbit_settings: RabbitSettings = RabbitSettings()
     watched_filter_settings: WatchedFilterSettings = WatchedFilterSettings()
     recommendation_settings: RecommendationSettings = RecommendationSettings()
+    regular_pipeline_settings: RegularPipelineSettings = RegularPipelineSettings()
 
 
 settings = AppSettings()
