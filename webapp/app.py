@@ -6,6 +6,7 @@ import requests
 from flask import Flask, render_template, request, session
 
 from shared.config import settings
+from shared.models import NewItemsEvent
 
 app = Flask("webapp")
 app.secret_key = os.urandom(24)
@@ -97,9 +98,10 @@ def fetch_items_data_for_item_ids(item_ids):
 
 if __name__ == "__main__":
     data = {
-        "item_ids": list(map(str, movie_id_genres.keys())),
-        "genres": list(map(str, movie_id_genres.values())),
+        "item_ids": [str(i) for i in movie_id_genres.keys()],
+        "genres": [str(i) for i in movie_id_genres.values()],
     }
+
     requests.post(
         f"{settings.services_settings.recommendation_service_url}/add_items", json=data
     )
