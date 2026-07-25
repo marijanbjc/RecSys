@@ -7,11 +7,15 @@ from aio_pika import Message
 from aio_pika.abc import AbstractRobustConnection, AbstractRobustExchange
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import redis
 
+from shared.logger import setup_logger
 from shared.config import AppSettings, settings
 from shared.models import InteractEvent
-from shared.watched_filter import WatchedFilter
 
+
+logger = setup_logger("event-collector")
+logger.setLevel(settings.LOG_LEVEL)
 app = FastAPI()
 # Configure CORS
 app.add_middleware(
@@ -22,8 +26,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class InteractionManager:
+    def __init__(self, settings: AppSettings) -> None:
+        self.interaction_prefix = settings.redis_settings.INTERACTION_PREFIX
+        self.redis_connection = redis.Redis(
+            host=settings.redis_settings.HOST,
+            port=settings.redis_settings.PORT,
+            db=settings.redis_settings.DB,
+        )
 
-watched_filter = WatchedFilter(settings)
+    def add(self, user_id: str, items_ids: list[str]) -> None:
+        try:
+            logger.info(f"Finding user interaction-history {user_id}")
+            history = self.redis_connection.json().get(f"{self.interaction_prefix}-{user_id}")
+            logger.info(f"Found history {history}")
+            if history is None:
+                history = []
+            history.extend(items_ids)
+            logger.info(f"Setting history {history}")
+            self.redis_connection.json().set(f"{self.interaction_prefix}-{user_id}", history)
+        except Exception as e:
+            logger.error(e)
+
+interaction_manager = InteractionManager(settings)
 
 _rabbitmq_connection: AbstractRobustConnection = None
 _rabbitmq_exchange = None
@@ -77,5 +102,5 @@ async def interact(message: InteractEvent) -> int:
         settings=settings,
     )
 
-    watched_filter.add(message.user_id, message.item_ids)
+    interaction_manager.add(message.user_id, message.item_ids)
     return 200
