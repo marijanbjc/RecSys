@@ -82,7 +82,11 @@ class RecommendationManager:
                     self.TOP_RECOMMENDATION_PREFIX
                 )
 
-                item_ids = np.random.choice(top_items, self.TOP_K, replace=False)
+                if top_items is not None:
+                    item_ids = np.random.choice(top_items, self.TOP_K, replace=False)
+                else:
+                    item_ids = []
+
                 logger.info(f"Sampled top items: {item_ids}")
 
             else:
