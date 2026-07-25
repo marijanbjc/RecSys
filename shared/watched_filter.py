@@ -37,7 +37,7 @@ class WatchedFilter:
 
     def remove_all(self) -> None:
         try:
-            self.redis_connection.delete(f"{self.watched_prefix}-*")
+            self.redis_connection.json().delete(f"{self.watched_prefix}*")
         except redis.exceptions.ConnectionError:
             # ignore errors if redis unavailable
             pass
