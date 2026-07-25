@@ -44,7 +44,7 @@ class InteractionManager:
                 history = []
             history.extend(items_ids)
             logger.info(f"Setting history {history}")
-            self.redis_connection.json().set(f"{self.interaction_prefix}-{user_id}", history)
+            self.redis_connection.json().set(f"{self.interaction_prefix}-{user_id}", ".", history)
         except Exception as e:
             logger.error(e)
 
