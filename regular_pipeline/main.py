@@ -29,11 +29,11 @@ class RedisManager:
         )
 
         self.TOP_RECOMMENDATION_PREFIX = (
-            settings.redis_settings.TOP_RECOMMENDATION_PREFIX
+            settings.TOP_RECOMMENDATION_PREFIX
         )
 
         self.ALS_RECOMMENDATION_PREFIX = (
-            settings.redis_settings.ALS_RECOMMENDATION_PREFIX
+            settings.ALS_RECOMMENDATION_PREFIX
         )
 
     def set_top_items(self, top_items: list[str]) -> None:
@@ -50,7 +50,7 @@ class RedisManager:
 
 async def collect_messages(settings: AppSettings):
     connection = await aio_pika.connect_robust(
-        f"amqp://{settings.rabbit_settings.HOST}:{settings.rabbit_settings.USER}@rabbitmq:{settings.rabbit_settings.PORT}/",
+        f"amqp://{settings.rabbit_settings.USER}:{settings.rabbit_settings.PASSWORD}@{settings.rabbit_settings.HOST}:{settings.rabbit_settings.PORT}/",
         loop=asyncio.get_event_loop(),
     )
 
@@ -68,7 +68,7 @@ async def collect_messages(settings: AppSettings):
         exchange = await channel.declare_exchange(
             settings.rabbit_settings.EXCHANGE, type="direct"
         )
-        await queue.bind(exchange, settings.rabbit_settings.routing_key)
+        await queue.bind(exchange, settings.rabbit_settings.ROUTING_KEY)
 
         t_start = time.time()
         data = []
@@ -227,7 +227,7 @@ class ALSRecommender:
             settings.ALS_ITERATIONS,
             settings.ALS_ALPHA,
             settings.ALS_REGULARIZATION,
-            settings.random_state,
+            settings.ALS_RANDOM_STATE,
         )
 
         self.model: AlternatingLeastSquares | None = None
