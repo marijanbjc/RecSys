@@ -19,3 +19,4 @@ class InteractEvent(BaseModel):
 
 class NewItemsEvent(BaseModel):
     item_ids: list[str] = Field(description="identifiers of new items")
+    genres: list[list[str]] = Field(description="list of genres")
