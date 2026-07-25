@@ -77,6 +77,14 @@ def index():
         user_id=user_id,
     )
 
+@app.route("/interact", methods=["POST"])
+def interact_proxy():
+    response = requests.post(
+        f"{settings.services_settings.interactions_service_url}/interact",
+        json=request.json,
+        headers={"Content-Type": "application/json"}
+    )
+    return response.content, response.status_code
 
 def get_user_id_from_cookies():
     # Implement your logic to retrieve user_id from cookies
