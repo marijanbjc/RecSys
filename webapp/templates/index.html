@@ -46,7 +46,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: '{{ interactions_url }}/interact',
+                url: '/interact', // {{ interactions_url }}/interact'
                 contentType: 'application/json',
                 data: JSON.stringify({user_id: CURRENT_USER_ID, item_ids: [item_id.toString()], actions: [action]}),
                 success: function (response) {
