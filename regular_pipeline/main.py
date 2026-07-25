@@ -233,7 +233,7 @@ class ALSRecommender:
         self.model: AlternatingLeastSquares | None = None
 
     def fit(self, user_item_data: sp.csr_matrix) -> None:
-        self.model = AlternatingLeastSquares(**self.model_params.dict())
+        self.model = AlternatingLeastSquares(**self.model_params.model_dump())
         self.model.fit(user_item_data)
 
     def recommend_all(
@@ -415,7 +415,7 @@ def calculate_als_recommendations(
         k=10,
     )
 
-    logger.info(f"len of recommendations: {len(_)}")
+    logger.info(f"len of recommendations: {len(_)} = {_}")
 
 
 async def calculate_recommendations(redis_manager: RedisManager) -> None:
