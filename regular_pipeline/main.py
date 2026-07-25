@@ -17,7 +17,7 @@ from shared.config import AppSettings, RedisSettings, settings, RegularPipelineS
 from shared.logger import setup_logger
 
 logger = setup_logger("regular_pipeline")
-logger.setLevel(settings.log_level)
+logger.setLevel(settings.LOG_LEVEL)
 
 
 class RedisManager:
